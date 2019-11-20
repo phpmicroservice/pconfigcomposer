@@ -1,0 +1,29 @@
+{
+  "name": "phpmicroservice/pconfig",
+  "type": "project",
+  "keywords": [
+    "phalcon",
+    "microservice",
+    "config"
+  ],
+  "description": "配置读取工具",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Dongasai",
+      "email": "1514582970@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "phpmicroservice/pms-frame": "*"
+  },
+  "require-dev": {
+    "phalcon/ide-stubs": "v3.4.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "pconfig\\": "src/"
+    }
+  }
+}
