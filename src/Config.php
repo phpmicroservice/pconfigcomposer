@@ -22,10 +22,32 @@ class Config
 
 
     /**
-     * 配置初始化
+     * 初始化
+     * Config constructor.
+     * @param string $addr 配置中心地址
+     * @param string $consumer 消费者名字
+     * @param string $type 鉴权类型
+     * @param string $key 鉴权KEY
+     * @param string $path 存放地址
      */
-    public function __construct(string $addr, $consumer = 'public', $type = 'kong', $key = '', $path = '')
+    public function __construct(string $addr = '', $consumer = '', $type = '', $key = '', $path = '')
     {
+
+        if (!$addr) {
+            $addr = \pms\get_env('PCONFIG_ADDR', "http://192.168.0.179:9018");
+        }
+
+        if (!$key) {
+            $key = \pms\get_env('PCONFIG_KEY', '123');
+        }
+
+        if (!$consumer) {
+            $consumer = \pms\get_env('PCONFIG_CONSUMER', 'b8');
+        }
+
+        if (!$type) {
+            $type = \pms\get_env('PCONFIG_TYPE', 'sig');
+        }
         $this->addr = $addr;
         $this->type = $type;
         $this->consumer = $consumer;
@@ -37,8 +59,11 @@ class Config
         }
     }
 
-    public function get($pid, $datatype = 'json')
+    public function get($pid=0, $datatype = 'json')
     {
+        if (!$pid) {
+            $pid = \pms\get_env('PCONFIG_PID', '1');
+        }
         $url = $this->addr . '/out/index';
         $data = [
             'cname' => $this->consumer,
@@ -47,8 +72,7 @@ class Config
         ];
         $data['token'] = $this->getToken($data);
         $dd = $this->curlPost($url, $data, 5);
-        $re_json= json_decode($dd,true);
-        var_dump($re_json);
+        $re_json = json_decode($dd, true);
         $myfile = fopen($this->path, "w") or die("配置文件打开失败,可能是权限不对或文件不存在!");
         fwrite($myfile, json_encode($re_json['data']));
         fclose($myfile);
