@@ -46,7 +46,7 @@ class Config
         }
 
         if (!$type) {
-            $type = \pms\get_env('PCONFIG_TYPE', 'sig');
+            $type = \pms\get_env('PCONFIG_TYPE', 'sign');
         }
         $this->addr = $addr;
         $this->type = $type;
