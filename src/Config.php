@@ -68,7 +68,8 @@ class Config
         $data = [
             'cname' => $this->consumer,
             'pid' => $pid,
-            'type' => $datatype
+            'type' => $datatype,
+            'uniqid'=>uniqid().time()
         ];
         $data['token'] = $this->getToken($data);
         $dd = $this->curlPost($url, $data, 5);
