@@ -1,6 +1,6 @@
 <?php
 
-namespace regreg;
+namespace pconfig;
 
 use Phalcon\Events\Event;
 use pms\Output;
@@ -11,7 +11,7 @@ use pms\Output;
  * @property \pms\bear\ClientCoroutine $register_client
  * @package pms
  */
-class Register
+class Config
 {
 
     private $addr;# 地址
@@ -31,16 +31,27 @@ class Register
         $this->consumer = $consumer;
         $this->key = $key;
         if (!$path) {
-            $this->path = ROOT_DIR . '/config/config';
+            $this->path = ROOT_DIR . '/config/data.json';
         } else {
             $this->path = $path;
         }
     }
 
-    public function get()
+    public function get($pid, $datatype = 'json')
     {
-        $url=$this->addr.'/out/index';
-        
+        $url = $this->addr . '/out/index';
+        $data = [
+            'cname' => $this->consumer,
+            'pid' => $pid,
+            'type' => $datatype
+        ];
+        $data['token'] = $this->getToken($data);
+        $dd = $this->curlPost($url, $data, 5);
+        $re_json= json_decode($dd,true);
+        var_dump($re_json);
+        $myfile = fopen($this->path, "w") or die("配置文件打开失败,可能是权限不对或文件不存在!");
+        fwrite($myfile, json_encode($re_json['data']));
+        fclose($myfile);
     }
 
     /**
@@ -71,7 +82,10 @@ class Register
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
         //curl_setopt($curl, CURLOPT_HEADER, 0); // 显示返回的Header区域内容
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);     // 获取的信息以文件流的形式返回
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header); //模拟的header头
+        if ($header) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header); //模拟的header头
+        }
+
         $result = curl_exec($ch);
 
         // 打印请求的header信息
@@ -80,6 +94,36 @@ class Register
 
         curl_close($ch);
         return $result;
+    }
+
+
+    private function getToken($data)
+    {
+        switch ($this->type) {
+            case 'sign':
+                return $this->getSign($data, $this->key);
+            case 'token':
+        }
+
+    }
+
+    /**
+     * 获取hash 排序,拼接串,拼接key,url格式化,md5
+     * @param array $resource
+     * @param string $sign
+     * @return string
+     */
+    private function getSign(array $resource, string $sign): string
+    {
+        $chuan = '';
+        ksort($resource);
+        foreach ($resource as $k => $v) {
+            $chuan .= '&' . $k . '=' . $v;
+        }
+        $chuan = trim($chuan, '&');
+        $chuan = $chuan . '&key=' . $sign;
+        return md5(urlencode($chuan));
+
     }
 
 
