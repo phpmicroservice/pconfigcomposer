@@ -1,6 +1,6 @@
 {
   "name": "phpmicroservice/pconfig",
-  "type": "project",
+  "type": "library",
   "keywords": [
     "phalcon",
     "microservice",
