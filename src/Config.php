@@ -74,6 +74,11 @@ class Config
         $data['token'] = $this->getToken($data);
         $dd = $this->curlPost($url, $data, 5);
         $re_json = json_decode($dd, true);
+        if(empty($re_json)){
+            echo "没有获取到配置信息!";
+            exit(1);
+        }
+        
         var_dump($re_json);
         $myfile = fopen($this->path, "w") or die("配置文件打开失败,可能是权限不对或文件不存在!");
         fwrite($myfile, json_encode($re_json['data']));
