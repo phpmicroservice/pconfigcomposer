@@ -75,7 +75,7 @@ class Config
         $dd = $this->curlPost($url, $data, 5);
         $re_json = json_decode($dd, true);
         if(empty($re_json)){
-            echo "没有获取到配置信息!";
+            echo "没有获取到配置信息!".$url;
             exit(1);
         }
         
